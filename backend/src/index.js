@@ -28,8 +28,8 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 
 app.use(cors({
-  origin: process.env.NODE_ENV === "production" 
-    ? process.env.CLIENT_URL 
+  origin: process.env.NODE_ENV === "production"
+    ? process.env.CLIENT_URL
     : "http://localhost:5173",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE']
@@ -42,40 +42,40 @@ app.use("/api/messages", messageRoutes);
 
 // Test route
 app.get("/api/health", (req, res) => {
-    res.json({ status: "OK" });
-  });
-  
+  res.json({ status: "OK" });
+});
+
 // Serve frontend in production
 
 if (process.env.NODE_ENV === "production") {
-    // Serve the static files
-    app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+  // Serve the static files
+  app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
-    // Handle client-side routing
-    app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
-    });
+  // Handle client-side routing
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+  });
 
-    server.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
+  // server.listen(PORT, () => {
+  //     console.log(`Server running on port ${PORT}`);
+  //   });
 }
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-      error: process.env.NODE_ENV === 'production' 
-        ? 'Internal server error' 
-        : err.message
-    });
+  console.error(err.stack);
+  res.status(500).json({
+    error: process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
+      : err.message
   });
+});
 
- 
-  
 
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-    connectDB();
-  });
+
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  connectDB();
+});
 
 export default app;
