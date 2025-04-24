@@ -16,6 +16,8 @@ export const useAuthStore = create(persist(
     onlineUsers: [],
     isCheckingAuth: true,
     socket:null,
+    isReceivingCall: false,
+    caller: null,
 
     checkAuth: async () => {
         try {
@@ -108,18 +110,28 @@ export const useAuthStore = create(persist(
     connectSocket: () => {
       const { authUser } = get();
       if (!authUser || get().socket?.connected) return;
-  
+    
       const socket = io(BASE_URL, {
         query: {
           userId: authUser._id,
         },
       });
+    
       socket.connect();
-  
-      set({ socket: socket });
-  
+      set({ socket });
+    
       socket.on("getOnlineUsers", (userIds) => {
         set({ onlineUsers: userIds });
+      });
+    
+      socket.on("incomingCall", ({ from }) => {
+        socket.incomingCall = true;
+        toast.success("Incoming video call...");
+      });
+    
+      socket.on("callEnded", () => {
+        socket.incomingCall = false;
+        toast.error("Call ended");
       });
     },
     disconnectSocket: () => {

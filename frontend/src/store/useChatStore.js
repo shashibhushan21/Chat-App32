@@ -136,4 +136,23 @@ export const useChatStore = create((set, get) => ({
   },
 
   setSelectedUser: (selectedUser) => set({ selectedUser }),
+  
+}));
+
+// import { create } from 'zustand';
+
+export const useVideoCallStore = create((set) => ({
+  isReceivingCall: false,
+  caller: null,
+  callAccepted: false,
+  
+  setIsReceivingCall: (value) => set({ isReceivingCall: value }),
+  setCaller: (caller) => set({ caller }),
+  setCallAccepted: (value) => set({ callAccepted: value }),
+  
+  resetCall: () => set({
+    isReceivingCall: false,
+    caller: null,
+    callAccepted: false
+  })
 }));

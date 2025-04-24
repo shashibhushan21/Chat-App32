@@ -24,7 +24,27 @@ export function getReceiverSocketId(userId) {
 const userSocketMap = {}; //{userId: socketId}
 
 io.on("connection", (socket) => {
-  console.log("New client connected", socket.id);
+  // console.log("New client connected", socket.id);
+
+  
+ // Handle video call signaling
+ socket.on("initiateCall", ({ to }) => {
+  const receiverSocketId = userSocketMap[to];
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("incomingCall", {
+      from: socket.handshake.query.userId,
+    });
+  }
+});
+
+socket.on("endCall", ({ to }) => {
+  const receiverSocketId = userSocketMap[to];
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("callEnded");
+  }
+});
+
+
 
   // Listen for messages from the client
   const userId = socket.handshake.query.userId;
@@ -32,8 +52,6 @@ io.on("connection", (socket) => {
 
   // io.emit() is used to send events to all the connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
-
-
 
 
   socket.on("messageRead", ({ messageId, userId }) => {
